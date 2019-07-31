@@ -31,10 +31,15 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from __future__ import division, with_statement
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from io import StringIO
+import sys
+if sys.version_info > (3,0):
+    # https://stackoverflow.com/questions/50797043/string-argument-expected-got-bytes-in-buffer-write
+    from io import BytesIO as IOStream
+else:
+    try:
+        from cStringIO import StringIO as IOStream
+    except ImportError:
+        from io import StringIO as IOStream
 
 from python_qt_binding.QtCore import qWarning
 
@@ -96,7 +101,7 @@ class TopicInfo(ROSTopicHz):
             # FIXME: this only works for message of class AnyMsg
             # self.sizes.append(len(message._buff))
             # time consuming workaround...
-            buff = StringIO()
+            buff = IOStream()
             message.serialize(buff)
             self.sizes.append(len(buff.getvalue()))
 
